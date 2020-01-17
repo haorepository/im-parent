@@ -1,0 +1,67 @@
+server:
+  port: 8080
+  servlet:
+    contextPath: /im-gateway
+spring:
+  zipkin:
+    base-url: http://127.0.0.1:9411/
+    sender:
+      type: web
+  sleuth:
+    #web:
+      #enabled: true
+    #trace-id128: true
+    sampler:
+      probability: 1.0
+  application:
+    name: im-gateway
+  redis:
+    expiredTime: 60
+    host: 127.0.0.1
+    port: 6379
+    timeout: 3000
+    lettuce: 
+      pool:
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
+        max-active: 8
+  cloud:
+    gateway:
+      default-filters:
+      discovery:
+        locator:
+          enabled: false
+          lowerCaseServiceId: true
+      routes:
+      - id: path_route
+        uri: lb://im-user-client
+        #uri: http://localhost:8086/im-user-client
+        predicates:
+        - Path=/im-user-client/user/**
+        - Method=POST
+        filters:
+        #- StripPrefix=0
+        - name: Hystrix
+          args:
+            name: fallbackcmd
+            fallbackUri: forward:/gateway/fallback
+# hystrix 信号量隔离，10秒后自动超时
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 10000
+    shareSecurityContext: true          
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://admin:wanghao@127.0.0.1:8888/ek-server/eureka/
+#logging:
+  #level:
+   #root: debug     

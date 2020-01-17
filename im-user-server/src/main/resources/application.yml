@@ -1,0 +1,36 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /im-user-server
+spring:
+  zipkin:
+    base-url: http://127.0.0.1:9411/
+    sender:
+      type: web
+  sleuth:
+    #web:
+      #enabled: true
+    #trace-id128: true
+    sampler:
+      probability: 1.0
+  application:
+    name: im-user-server
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    timeout: 3000
+    lettuce: 
+      pool:
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
+        max-active: 8
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://admin:wanghao@127.0.0.1:8888/ek-server/eureka/
+#logging:
+  #level:
+    #root: debug
